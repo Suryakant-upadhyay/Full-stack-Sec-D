@@ -1,20 +1,23 @@
-# Lab Sheet 04 — React Shopping App
+# LAB SHEET 05 — React Form Validation
 
-This project implements the React shopping application shown in the college lab submission reference.
+## Task-wise implementation
 
-## Concepts demonstrated
+### TASK 5.1 — Password Strength
+- Live password strength calculation
+- Five security checks
+- Strength progress bar
 
-- React functional components
-- `useState`
-- `useEffect`
-- `createContext` / `useContext`
-- React Router navigation
-- Product listing
-- Loading state
-- Product details using route parameters
-- Shared cart state
-- Add-to-cart behavior
-- Responsive styling
+### TASK 5.2 — Login Form Validation
+- Email validation
+- Password security validation
+- Error messages
+- Successful login message
+
+### TASK 5.3 — User Onboarding Wizard
+- Step 1: Personal Information
+- Step 2: Account Information
+- Step 3: Confirmation
+- Back / Next / Submit flow
 
 ## Run
 

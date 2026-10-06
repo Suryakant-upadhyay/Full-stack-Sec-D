@@ -1,331 +1,385 @@
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useMemo,
-  useState
-} from "react";
-import {
-  BrowserRouter,
-  Link,
-  Route,
-  Routes,
-  useNavigate,
-  useParams
-} from "react-router-dom";
+import React, { useState } from "react";
 
-const products = [
-  {
-    id: 1,
-    name: "Nova X1 Smartphone",
-    price: 32999,
-    category: "Electronics",
-    emoji: "📱",
-    description: "A premium everyday smartphone with a bright display, fast performance and all-day battery."
-  },
-  {
-    id: 2,
-    name: "Pulse Pro Headphones",
-    price: 5999,
-    category: "Audio",
-    emoji: "🎧",
-    description: "Wireless headphones with clear sound, comfortable ear cushions and reliable battery life."
-  },
-  {
-    id: 3,
-    name: "Aero Smartwatch",
-    price: 7499,
-    category: "Wearables",
-    emoji: "⌚",
-    description: "A modern smartwatch for notifications, fitness tracking and everyday productivity."
-  },
-  {
-    id: 4,
-    name: "Mecha Keyboard",
-    price: 4299,
-    category: "Accessories",
-    emoji: "⌨️",
-    description: "A compact mechanical keyboard designed for comfortable coding and gaming sessions."
-  },
-  {
-    id: 5,
-    name: "Vision 4K Monitor",
-    price: 24999,
-    category: "Displays",
-    emoji: "🖥️",
-    description: "A sharp 4K monitor with an immersive workspace for study, design and entertainment."
-  },
-  {
-    id: 6,
-    name: "Orbit Gaming Mouse",
-    price: 2199,
-    category: "Accessories",
-    emoji: "🖱️",
-    description: "A lightweight precision mouse with responsive controls for work and gaming."
-  }
-];
+/* =========================================================
+   LAB SHEET 05
+   TASK 5.1 + TASK 5.2 + TASK 5.3
+   ========================================================= */
 
-const CartContext = createContext(null);
+/* ========================= TASK 5.1 =========================
+   Password Strength Component
+   Five rules:
+   1. At least 8 characters
+   2. Uppercase letter
+   3. Lowercase letter
+   4. Number
+   5. Special character
+   ========================================================= */
 
-function CartProvider({ children }) {
-  const [cart, setCart] = useState([]);
+function PasswordStrength({ password }) {
+  let score = 0;
 
-  function addToCart(product) {
-    setCart((current) => [...current, product]);
-  }
+  if (password.length >= 8) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
 
-  function removeFromCart(index) {
-    setCart((current) => current.filter((_, i) => i !== index));
-  }
-
-  const total = cart.reduce((sum, item) => sum + item.price, 0);
-
-  const value = useMemo(
-    () => ({ cart, addToCart, removeFromCart, total }),
-    [cart, total]
-  );
+  let strength = "Very Weak";
+  if (score === 2) strength = "Weak";
+  if (score === 3) strength = "Medium";
+  if (score === 4) strength = "Strong";
+  if (score === 5) strength = "Very Strong";
 
   return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
-  );
-}
-
-function useCart() {
-  return useContext(CartContext);
-}
-
-function Navbar() {
-  const { cart } = useCart();
-
-  return (
-    <nav className="navbar">
-      <Link className="brand" to="/">MY<span>SHOP</span></Link>
-
-      <div className="nav-links">
-        <Link to="/">Home</Link>
-        <Link to="/products">Products</Link>
-        <Link className="cart-pill" to="/cart">
-          🛒 Cart <b>{cart.length}</b>
-        </Link>
+    <div className="strength-container">
+      <div className="strength-top">
+        <span>Password Strength</span>
+        <strong>{strength}</strong>
       </div>
-    </nav>
-  );
-}
 
-function Home() {
-  return (
-    <section className="hero page">
-      <div className="hero-copy">
-        <p className="eyebrow">LAB SHEET 04 · REACT</p>
-        <h1>Everything you need.<br /><span>One simple shop.</span></h1>
-        <p>
-          A React single-page shopping application demonstrating components,
-          routing, hooks and shared cart state.
+      <div className="strength-bar">
+        <div
+          className="strength-progress"
+          style={{ width: `${score * 20}%` }}
+        />
+      </div>
+
+      <div className="rules">
+        <p className={password.length >= 8 ? "valid" : "invalid"}>
+          {password.length >= 8 ? "✓" : "✗"} At least 8 characters
         </p>
-        <Link className="primary-btn" to="/products">View Products →</Link>
+        <p className={/[A-Z]/.test(password) ? "valid" : "invalid"}>
+          {/[A-Z]/.test(password) ? "✓" : "✗"} Uppercase letter
+        </p>
+        <p className={/[a-z]/.test(password) ? "valid" : "invalid"}>
+          {/[a-z]/.test(password) ? "✓" : "✗"} Lowercase letter
+        </p>
+        <p className={/[0-9]/.test(password) ? "valid" : "invalid"}>
+          {/[0-9]/.test(password) ? "✓" : "✗"} Number
+        </p>
+        <p className={/[^A-Za-z0-9]/.test(password) ? "valid" : "invalid"}>
+          {/[^A-Za-z0-9]/.test(password) ? "✓" : "✗"} Special character
+        </p>
       </div>
-
-      <div className="hero-orb">
-        <div className="orb-card">
-          <span>NEW</span>
-          <strong>Tech Collection</strong>
-          <small>Fresh picks for your setup.</small>
-        </div>
-      </div>
-    </section>
+    </div>
   );
 }
 
-function Products() {
-  const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState("All");
-  const { addToCart } = useCart();
+/* ========================= TASK 5.2 =========================
+   Login Form Validation
+   ========================================================= */
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 700);
-    return () => clearTimeout(timer);
-  }, []);
+function LoginForm() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
 
-  const categories = ["All", ...new Set(products.map((item) => item.category))];
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  const visibleProducts =
-    category === "All"
-      ? products
-      : products.filter((item) => item.category === category);
+  const rules = {
+    length: password.length >= 8,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    number: /[0-9]/.test(password),
+    special: /[^A-Za-z0-9]/.test(password)
+  };
 
-  if (loading) {
-    return (
-      <section className="page centered">
-        <div className="loader"></div>
-        <p>Loading products...</p>
-      </section>
-    );
+  const validPassword = Object.values(rules).every(Boolean);
+
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    if (!emailRegex.test(email)) {
+      setMessage("Please enter a valid email address.");
+      return;
+    }
+
+    if (!validPassword) {
+      setMessage("Password does not meet security requirements.");
+      return;
+    }
+
+    setMessage("Login Successfully!");
   }
 
   return (
-    <section className="page">
-      <div className="section-head">
-        <div>
-          <p className="eyebrow">OUR COLLECTION</p>
-          <h2>Products</h2>
-        </div>
-
-        <div className="filters">
-          {categories.map((item) => (
-            <button
-              key={item}
-              className={category === item ? "filter active" : "filter"}
-              onClick={() => setCategory(item)}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
+    <div className="form-container">
+      <div className="card-heading">
+        <span className="task-badge">TASK 5.2</span>
+        <h2>Login Form</h2>
+        <p>Validate email and password before submission.</p>
       </div>
 
-      <div className="product-grid">
-        {visibleProducts.map((product) => (
-          <article className="product-card" key={product.id}>
-            <Link className="product-visual" to={`/products/${product.id}`}>
-              <span>{product.emoji}</span>
-            </Link>
+      <form onSubmit={handleSubmit}>
+        <label>Email</label>
+        <input
+          type="email"
+          placeholder="Enter your email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+        />
 
-            <div className="product-info">
-              <small>{product.category}</small>
-              <h3>{product.name}</h3>
-              <p>{product.description}</p>
+        {email && !emailRegex.test(email) && (
+          <span className="error">Invalid email format</span>
+        )}
 
-              <div className="product-bottom">
-                <strong>₹{product.price.toLocaleString("en-IN")}</strong>
-                <button
-                  className="small-btn"
-                  onClick={() => addToCart(product)}
-                >
-                  Add
-                </button>
-              </div>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
+        <label>Password</label>
+        <input
+          type="password"
+          placeholder="Enter your password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+        />
+
+        <PasswordStrength password={password} />
+
+        <button className="primary-btn full" type="submit">
+          Login
+        </button>
+
+        {message && (
+          <p className={message.includes("Successfully") ? "success" : "message"}>
+            {message}
+          </p>
+        )}
+      </form>
+    </div>
   );
 }
 
-function ProductDetails() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { addToCart } = useCart();
+/* ========================= TASK 5.3 =========================
+   Step 1 — Personal Information
+   ========================================================= */
 
-  const product = products.find((item) => item.id === Number(id));
-
-  if (!product) {
-    return (
-      <section className="page centered">
-        <h2>Product not found</h2>
-        <Link className="primary-btn" to="/products">Back to Products</Link>
-      </section>
-    );
+function PersonalInfo({ data, updateData, nextStep }) {
+  function handleNext() {
+    if (!data.name.trim() || !data.age.trim()) return;
+    nextStep();
   }
 
   return (
-    <section className="page detail-page">
-      <button className="back-btn" onClick={() => navigate(-1)}>← Back</button>
+    <div>
+      <h3>Step 1: Personal Information</h3>
 
-      <div className="detail-card">
-        <div className="detail-visual">{product.emoji}</div>
+      <label>Full Name</label>
+      <input
+        type="text"
+        placeholder="Enter your full name"
+        value={data.name}
+        onChange={(event) => updateData({ name: event.target.value })}
+      />
 
-        <div className="detail-content">
-          <span className="category-label">{product.category}</span>
-          <h1>{product.name}</h1>
-          <p>{product.description}</p>
-          <div className="detail-price">₹{product.price.toLocaleString("en-IN")}</div>
-          <button
-            className="primary-btn"
-            onClick={() => addToCart(product)}
-          >
-            Add to Cart
-          </button>
-        </div>
+      <label>Age</label>
+      <input
+        type="number"
+        placeholder="Enter your age"
+        value={data.age}
+        onChange={(event) => updateData({ age: event.target.value })}
+      />
+
+      <div className="wizard-actions end">
+        <button className="primary-btn" onClick={handleNext}>
+          Next →
+        </button>
       </div>
-    </section>
+    </div>
   );
 }
 
-function Cart() {
-  const { cart, removeFromCart, total } = useCart();
+/* ========================= TASK 5.3 =========================
+   Step 2 — Account Information
+   ========================================================= */
 
-  if (cart.length === 0) {
-    return (
-      <section className="page centered">
-        <div className="empty-cart">🛒</div>
-        <h2>Your cart is empty</h2>
-        <p>Add a product to see it here.</p>
-        <Link className="primary-btn" to="/products">Shop Products</Link>
-      </section>
-    );
+function AccountInfo({
+  data,
+  updateData,
+  previousStep,
+  nextStep
+}) {
+  function handleNext() {
+    if (!data.email.trim() || !data.password.trim()) return;
+    nextStep();
   }
 
   return (
-    <section className="page">
-      <div className="section-head">
-        <div>
-          <p className="eyebrow">YOUR BAG</p>
-          <h2>Shopping Cart</h2>
-        </div>
-        <span className="count-label">{cart.length} item(s)</span>
-      </div>
+    <div>
+      <h3>Step 2: Account Information</h3>
 
-      <div className="cart-layout">
-        <div className="cart-list">
-          {cart.map((item, index) => (
-            <article className="cart-item" key={`${item.id}-${index}`}>
-              <div className="cart-icon">{item.emoji}</div>
-              <div className="cart-info">
-                <small>{item.category}</small>
-                <h3>{item.name}</h3>
-                <strong>₹{item.price.toLocaleString("en-IN")}</strong>
-              </div>
-              <button
-                className="delete-btn"
-                onClick={() => removeFromCart(index)}
-              >
-                Remove
-              </button>
-            </article>
-          ))}
-        </div>
+      <label>Email</label>
+      <input
+        type="email"
+        placeholder="Enter your email"
+        value={data.email}
+        onChange={(event) => updateData({ email: event.target.value })}
+      />
 
-        <aside className="summary">
-          <h3>Order Summary</h3>
-          <div><span>Items</span><span>{cart.length}</span></div>
-          <div><span>Subtotal</span><span>₹{total.toLocaleString("en-IN")}</span></div>
-          <div><span>Delivery</span><span>Free</span></div>
-          <hr />
-          <div className="grand"><span>Total</span><strong>₹{total.toLocaleString("en-IN")}</strong></div>
-          <button className="checkout">Checkout</button>
-        </aside>
+      <label>Password</label>
+      <input
+        type="password"
+        placeholder="Enter Password"
+        value={data.password}
+        onChange={(event) => updateData({ password: event.target.value })}
+      />
+
+      <div className="wizard-actions">
+        <button className="secondary-btn" onClick={previousStep}>
+          ← Back
+        </button>
+        <button className="primary-btn" onClick={handleNext}>
+          Next →
+        </button>
       </div>
-    </section>
+    </div>
   );
 }
+
+/* ========================= TASK 5.3 =========================
+   Step 3 — Confirmation
+   ========================================================= */
+
+function Confirmation({ data, previousStep, handleSubmit }) {
+  return (
+    <div>
+      <h3>Step 3: Confirm Details</h3>
+
+      <div className="confirmation">
+        <p><strong>Name:</strong> {data.name}</p>
+        <p><strong>Age:</strong> {data.age}</p>
+        <p><strong>Email:</strong> {data.email}</p>
+        <p><strong>Password:</strong> ••••••••</p>
+      </div>
+
+      <div className="wizard-actions">
+        <button className="secondary-btn" onClick={previousStep}>
+          ← Back
+        </button>
+        <button className="primary-btn" onClick={handleSubmit}>
+          Submit ✓
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ========================= MAIN APP ========================= */
 
 function App() {
+  const [page, setPage] = useState("login");
+  const [step, setStep] = useState(1);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    age: "",
+    email: "",
+    password: ""
+  });
+
+  function updateData(newData) {
+    setFormData((previousData) => ({
+      ...previousData,
+      ...newData
+    }));
+  }
+
+  function handleSubmit() {
+    alert("Registration completed successfully!");
+    console.log("Submitted Data:", formData);
+  }
+
   return (
-    <BrowserRouter>
-      <CartProvider>
-        <Navbar />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/products/:id" element={<ProductDetails />} />
-          <Route path="/cart" element={<Cart />} />
-        </Routes>
-        <footer>© 2026 Suryakant Upadhyay · Full Stack Lab · Lab Sheet 04</footer>
-      </CartProvider>
-    </BrowserRouter>
+    <main className="app-shell">
+      <header className="topbar">
+        <div>
+          <p className="eyebrow">FULL STACK LAB</p>
+          <h1>React Form Validation</h1>
+        </div>
+        <div className="lab-number">LAB 05</div>
+      </header>
+
+      <nav className="task-nav">
+        <button
+          className={page === "login" ? "nav-btn active" : "nav-btn"}
+          onClick={() => setPage("login")}
+        >
+          Task 5.1 + 5.2 · Login
+        </button>
+
+        <button
+          className={page === "onboarding" ? "nav-btn active" : "nav-btn"}
+          onClick={() => {
+            setPage("onboarding");
+            setStep(1);
+          }}
+        >
+          Task 5.3 · Onboarding
+        </button>
+      </nav>
+
+      {page === "login" && (
+        <section className="workspace">
+          <LoginForm />
+        </section>
+      )}
+
+      {page === "onboarding" && (
+        <section className="workspace">
+          <div className="form-container">
+            <div className="card-heading">
+              <span className="task-badge">TASK 5.3</span>
+              <h2>User Onboarding</h2>
+              <p>Complete all three steps to finish registration.</p>
+            </div>
+
+            <div className="stepper">
+              {[1, 2, 3].map((number) => (
+                <div
+                  className={step >= number ? "step active" : "step"}
+                  key={number}
+                >
+                  <span>{number}</span>
+                  <small>
+                    {number === 1
+                      ? "Personal"
+                      : number === 2
+                      ? "Account"
+                      : "Confirm"}
+                  </small>
+                </div>
+              ))}
+            </div>
+
+            {step === 1 && (
+              <PersonalInfo
+                data={formData}
+                updateData={updateData}
+                nextStep={() => setStep(2)}
+              />
+            )}
+
+            {step === 2 && (
+              <AccountInfo
+                data={formData}
+                updateData={updateData}
+                previousStep={() => setStep(1)}
+                nextStep={() => setStep(3)}
+              />
+            )}
+
+            {step === 3 && (
+              <Confirmation
+                data={formData}
+                previousStep={() => setStep(2)}
+                handleSubmit={handleSubmit}
+              />
+            )}
+          </div>
+        </section>
+      )}
+
+      <footer>
+        Suryakant Upadhyay · Full Stack Lab · Lab Sheet 05
+      </footer>
+    </main>
   );
 }
 
