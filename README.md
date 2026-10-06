@@ -1,14 +1,24 @@
-# LAB SHEET 08 — Task-wise Django Submission
+# Lab Sheet 04 — React Shopping App
 
-## Tasks
+This project implements the React shopping application shown in the college lab submission reference.
 
-### Task 8.1 — Dynamic Active Navigation Highlight
-Master `base.html` with active navigation based on `active_page`.
+## Concepts demonstrated
 
-### Task 8.2 — Persistent User Message Feedback
-Django messages displayed through the shared base template.
+- React functional components
+- `useState`
+- `useEffect`
+- `createContext` / `useContext`
+- React Router navigation
+- Product listing
+- Loading state
+- Product details using route parameters
+- Shared cart state
+- Add-to-cart behavior
+- Responsive styling
 
-### Task 8.3 — Professional Contact Us Form
-POST form with CSRF protection, validation, server logging and success feedback.
+## Run
 
-Each task is separated into its own folder for clear submission.
+```bash
+npm install
+npm run dev
+```
