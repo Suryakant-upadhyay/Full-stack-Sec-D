@@ -1,27 +1,14 @@
-# LAB SHEET 05 — React Form Validation
+# LAB SHEET 06 — Task-wise Submission
 
-## Task-wise implementation
+BTCS303P — Assignment 03
 
-### TASK 5.1 — Password Strength
-- Live password strength calculation
-- Five security checks
-- Strength progress bar
+## TASK 6.1
+Django Virtual Environment and Requirements Setup
 
-### TASK 5.2 — Login Form Validation
-- Email validation
-- Password security validation
-- Error messages
-- Successful login message
+## TASK 6.2
+VS Code Shortcuts and PEP8 Automation
 
-### TASK 5.3 — User Onboarding Wizard
-- Step 1: Personal Information
-- Step 2: Account Information
-- Step 3: Confirmation
-- Back / Next / Submit flow
+## TASK 6.3
+Automated Deployment Check Script
 
-## Run
-
-```bash
-npm install
-npm run dev
-```
+Each task has its own folder and README so the submission is clearly separated by task.
