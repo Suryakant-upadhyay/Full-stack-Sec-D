@@ -1,6 +1,20 @@
-# Lab Sheet 03 — React To-Do Application
+# Lab Sheet 04 — React Shopping App
 
-This implementation follows the Lab Sheet 03 React To-Do structure visible in the provided college submission reference: React entry point (`main.jsx`), an `App.jsx` component, state-based task handling, add/delete/toggle operations, and a browser entry page.
+This project implements the React shopping application shown in the college lab submission reference.
+
+## Concepts demonstrated
+
+- React functional components
+- `useState`
+- `useEffect`
+- `createContext` / `useContext`
+- React Router navigation
+- Product listing
+- Loading state
+- Product details using route parameters
+- Shared cart state
+- Add-to-cart behavior
+- Responsive styling
 
 ## Run
 
@@ -8,18 +22,3 @@ This implementation follows the Lab Sheet 03 React To-Do structure visible in th
 npm install
 npm run dev
 ```
-
-Then open the local URL shown by Vite.
-
-## Features
-
-- React functional components
-- `useState` for task state
-- `useEffect` for localStorage persistence
-- Add task validation
-- Duplicate-task validation
-- Complete/uncomplete task
-- Delete task
-- All / Active / Completed filters
-- Clear completed tasks
-- Responsive UI

@@ -1,213 +1,331 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState
+} from "react";
+import {
+  BrowserRouter,
+  Link,
+  Route,
+  Routes,
+  useNavigate,
+  useParams
+} from "react-router-dom";
 
-const STORAGE_KEY = "lab-sheet-03-tasks";
+const products = [
+  {
+    id: 1,
+    name: "Nova X1 Smartphone",
+    price: 32999,
+    category: "Electronics",
+    emoji: "📱",
+    description: "A premium everyday smartphone with a bright display, fast performance and all-day battery."
+  },
+  {
+    id: 2,
+    name: "Pulse Pro Headphones",
+    price: 5999,
+    category: "Audio",
+    emoji: "🎧",
+    description: "Wireless headphones with clear sound, comfortable ear cushions and reliable battery life."
+  },
+  {
+    id: 3,
+    name: "Aero Smartwatch",
+    price: 7499,
+    category: "Wearables",
+    emoji: "⌚",
+    description: "A modern smartwatch for notifications, fitness tracking and everyday productivity."
+  },
+  {
+    id: 4,
+    name: "Mecha Keyboard",
+    price: 4299,
+    category: "Accessories",
+    emoji: "⌨️",
+    description: "A compact mechanical keyboard designed for comfortable coding and gaming sessions."
+  },
+  {
+    id: 5,
+    name: "Vision 4K Monitor",
+    price: 24999,
+    category: "Displays",
+    emoji: "🖥️",
+    description: "A sharp 4K monitor with an immersive workspace for study, design and entertainment."
+  },
+  {
+    id: 6,
+    name: "Orbit Gaming Mouse",
+    price: 2199,
+    category: "Accessories",
+    emoji: "🖱️",
+    description: "A lightweight precision mouse with responsive controls for work and gaming."
+  }
+];
 
-function AddTaskForm({ onAddTask }) {
-  const [text, setText] = useState("");
-  const [error, setError] = useState("");
+const CartContext = createContext(null);
 
-  function handleSubmit(event) {
-    event.preventDefault();
-    const value = text.trim();
+function CartProvider({ children }) {
+  const [cart, setCart] = useState([]);
 
-    if (!value) {
-      setError("Please enter a task.");
-      return;
-    }
-
-    if (value.length < 3) {
-      setError("Task must contain at least 3 characters.");
-      return;
-    }
-
-    const added = onAddTask(value);
-
-    if (!added) {
-      setError("That task already exists.");
-      return;
-    }
-
-    setText("");
-    setError("");
+  function addToCart(product) {
+    setCart((current) => [...current, product]);
   }
 
+  function removeFromCart(index) {
+    setCart((current) => current.filter((_, i) => i !== index));
+  }
+
+  const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+  const value = useMemo(
+    () => ({ cart, addToCart, removeFromCart, total }),
+    [cart, total]
+  );
+
   return (
-    <form className="task-form" onSubmit={handleSubmit}>
-      <div className="input-wrap">
-        <input
-          value={text}
-          onChange={(event) => {
-            setText(event.target.value);
-            if (error) setError("");
-          }}
-          placeholder="What needs to be done?"
-          aria-label="New task"
-          maxLength={100}
-        />
-        {error && <p className="error">{error}</p>}
-      </div>
-      <button className="primary-btn" type="submit">
-        Add Task
-      </button>
-    </form>
+    <CartContext.Provider value={value}>
+      {children}
+    </CartContext.Provider>
   );
 }
 
-function TaskList({ tasks, onDelete, onToggle }) {
-  if (tasks.length === 0) {
-    return (
-      <div className="empty-state">
-        <div className="empty-icon">✓</div>
-        <h3>No tasks yet</h3>
-        <p>Add your first task above and start getting things done.</p>
+function useCart() {
+  return useContext(CartContext);
+}
+
+function Navbar() {
+  const { cart } = useCart();
+
+  return (
+    <nav className="navbar">
+      <Link className="brand" to="/">MY<span>SHOP</span></Link>
+
+      <div className="nav-links">
+        <Link to="/">Home</Link>
+        <Link to="/products">Products</Link>
+        <Link className="cart-pill" to="/cart">
+          🛒 Cart <b>{cart.length}</b>
+        </Link>
       </div>
+    </nav>
+  );
+}
+
+function Home() {
+  return (
+    <section className="hero page">
+      <div className="hero-copy">
+        <p className="eyebrow">LAB SHEET 04 · REACT</p>
+        <h1>Everything you need.<br /><span>One simple shop.</span></h1>
+        <p>
+          A React single-page shopping application demonstrating components,
+          routing, hooks and shared cart state.
+        </p>
+        <Link className="primary-btn" to="/products">View Products →</Link>
+      </div>
+
+      <div className="hero-orb">
+        <div className="orb-card">
+          <span>NEW</span>
+          <strong>Tech Collection</strong>
+          <small>Fresh picks for your setup.</small>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Products() {
+  const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState("All");
+  const { addToCart } = useCart();
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 700);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const categories = ["All", ...new Set(products.map((item) => item.category))];
+
+  const visibleProducts =
+    category === "All"
+      ? products
+      : products.filter((item) => item.category === category);
+
+  if (loading) {
+    return (
+      <section className="page centered">
+        <div className="loader"></div>
+        <p>Loading products...</p>
+      </section>
     );
   }
 
   return (
-    <ul className="task-list">
-      {tasks.map((task) => (
-        <li className={`task ${task.completed ? "completed" : ""}`} key={task.id}>
-          <button
-            className="check-btn"
-            type="button"
-            onClick={() => onToggle(task.id)}
-            aria-label={task.completed ? "Mark task active" : "Mark task completed"}
-          >
-            {task.completed ? "✓" : ""}
-          </button>
+    <section className="page">
+      <div className="section-head">
+        <div>
+          <p className="eyebrow">OUR COLLECTION</p>
+          <h2>Products</h2>
+        </div>
 
-          <span className="task-text">{task.text}</span>
+        <div className="filters">
+          {categories.map((item) => (
+            <button
+              key={item}
+              className={category === item ? "filter active" : "filter"}
+              onClick={() => setCategory(item)}
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </div>
 
+      <div className="product-grid">
+        {visibleProducts.map((product) => (
+          <article className="product-card" key={product.id}>
+            <Link className="product-visual" to={`/products/${product.id}`}>
+              <span>{product.emoji}</span>
+            </Link>
+
+            <div className="product-info">
+              <small>{product.category}</small>
+              <h3>{product.name}</h3>
+              <p>{product.description}</p>
+
+              <div className="product-bottom">
+                <strong>₹{product.price.toLocaleString("en-IN")}</strong>
+                <button
+                  className="small-btn"
+                  onClick={() => addToCart(product)}
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ProductDetails() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { addToCart } = useCart();
+
+  const product = products.find((item) => item.id === Number(id));
+
+  if (!product) {
+    return (
+      <section className="page centered">
+        <h2>Product not found</h2>
+        <Link className="primary-btn" to="/products">Back to Products</Link>
+      </section>
+    );
+  }
+
+  return (
+    <section className="page detail-page">
+      <button className="back-btn" onClick={() => navigate(-1)}>← Back</button>
+
+      <div className="detail-card">
+        <div className="detail-visual">{product.emoji}</div>
+
+        <div className="detail-content">
+          <span className="category-label">{product.category}</span>
+          <h1>{product.name}</h1>
+          <p>{product.description}</p>
+          <div className="detail-price">₹{product.price.toLocaleString("en-IN")}</div>
           <button
-            className="delete-btn"
-            type="button"
-            onClick={() => onDelete(task.id)}
-            aria-label={`Delete ${task.text}`}
+            className="primary-btn"
+            onClick={() => addToCart(product)}
           >
-            Delete
+            Add to Cart
           </button>
-        </li>
-      ))}
-    </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Cart() {
+  const { cart, removeFromCart, total } = useCart();
+
+  if (cart.length === 0) {
+    return (
+      <section className="page centered">
+        <div className="empty-cart">🛒</div>
+        <h2>Your cart is empty</h2>
+        <p>Add a product to see it here.</p>
+        <Link className="primary-btn" to="/products">Shop Products</Link>
+      </section>
+    );
+  }
+
+  return (
+    <section className="page">
+      <div className="section-head">
+        <div>
+          <p className="eyebrow">YOUR BAG</p>
+          <h2>Shopping Cart</h2>
+        </div>
+        <span className="count-label">{cart.length} item(s)</span>
+      </div>
+
+      <div className="cart-layout">
+        <div className="cart-list">
+          {cart.map((item, index) => (
+            <article className="cart-item" key={`${item.id}-${index}`}>
+              <div className="cart-icon">{item.emoji}</div>
+              <div className="cart-info">
+                <small>{item.category}</small>
+                <h3>{item.name}</h3>
+                <strong>₹{item.price.toLocaleString("en-IN")}</strong>
+              </div>
+              <button
+                className="delete-btn"
+                onClick={() => removeFromCart(index)}
+              >
+                Remove
+              </button>
+            </article>
+          ))}
+        </div>
+
+        <aside className="summary">
+          <h3>Order Summary</h3>
+          <div><span>Items</span><span>{cart.length}</span></div>
+          <div><span>Subtotal</span><span>₹{total.toLocaleString("en-IN")}</span></div>
+          <div><span>Delivery</span><span>Free</span></div>
+          <hr />
+          <div className="grand"><span>Total</span><strong>₹{total.toLocaleString("en-IN")}</strong></div>
+          <button className="checkout">Checkout</button>
+        </aside>
+      </div>
+    </section>
   );
 }
 
 function App() {
-  const [tasks, setTasks] = useState(() => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const [filter, setFilter] = useState("all");
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-  }, [tasks]);
-
-  function addTask(text) {
-    const duplicate = tasks.some(
-      (task) => task.text.toLowerCase() === text.toLowerCase()
-    );
-
-    if (duplicate) return false;
-
-    setTasks((current) => [
-      ...current,
-      {
-        id: crypto.randomUUID(),
-        text,
-        completed: false
-      }
-    ]);
-
-    return true;
-  }
-
-  function toggleTask(id) {
-    setTasks((current) =>
-      current.map((task) =>
-        task.id === id ? { ...task, completed: !task.completed } : task
-      )
-    );
-  }
-
-  function deleteTask(id) {
-    setTasks((current) => current.filter((task) => task.id !== id));
-  }
-
-  function clearCompleted() {
-    setTasks((current) => current.filter((task) => !task.completed));
-  }
-
-  const filteredTasks = useMemo(() => {
-    if (filter === "active") return tasks.filter((task) => !task.completed);
-    if (filter === "completed") return tasks.filter((task) => task.completed);
-    return tasks;
-  }, [tasks, filter]);
-
-  const activeCount = tasks.filter((task) => !task.completed).length;
-  const completedCount = tasks.length - activeCount;
-
   return (
-    <div className="page">
-      <main className="app-card">
-        <header className="app-header">
-          <div>
-            <p className="eyebrow">FULL STACK LAB · LAB SHEET 03</p>
-            <h1>React To-Do App</h1>
-            <p className="subtitle">
-              Manage tasks with React state, components, validation and local storage.
-            </p>
-          </div>
-          <div className="progress-ring" aria-label={`${completedCount} completed`}>
-            <strong>{completedCount}</strong>
-            <span>done</span>
-          </div>
-        </header>
-
-        <AddTaskForm onAddTask={addTask} />
-
-        <section className="toolbar" aria-label="Task filters">
-          <div className="filters">
-            {["all", "active", "completed"].map((item) => (
-              <button
-                key={item}
-                type="button"
-                className={filter === item ? "filter active" : "filter"}
-                onClick={() => setFilter(item)}
-              >
-                {item[0].toUpperCase() + item.slice(1)}
-              </button>
-            ))}
-          </div>
-
-          <span className="count">
-            {activeCount} {activeCount === 1 ? "task" : "tasks"} left
-          </span>
-        </section>
-
-        <TaskList
-          tasks={filteredTasks}
-          onDelete={deleteTask}
-          onToggle={toggleTask}
-        />
-
-        {completedCount > 0 && (
-          <button className="clear-btn" type="button" onClick={clearCompleted}>
-            Clear completed tasks
-          </button>
-        )}
-      </main>
-
-      <footer>
-        Built with React · Lab Sheet 03 · Suryakant Upadhyay
-      </footer>
-    </div>
+    <BrowserRouter>
+      <CartProvider>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/products" element={<Products />} />
+          <Route path="/products/:id" element={<ProductDetails />} />
+          <Route path="/cart" element={<Cart />} />
+        </Routes>
+        <footer>© 2026 Suryakant Upadhyay · Full Stack Lab · Lab Sheet 04</footer>
+      </CartProvider>
+    </BrowserRouter>
   );
 }
 
