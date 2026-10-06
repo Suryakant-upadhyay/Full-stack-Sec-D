@@ -1,14 +1,11 @@
-# LAB SHEET 06 — Task-wise Submission
+# LAB SHEET 07 — Task-wise Django Submission
 
-BTCS303P — Assignment 03
+## Tasks from the supplied lab sheet
 
-## TASK 6.1
-Django Virtual Environment and Requirements Setup
+1. Task 7.1 — Fallback Condition Logic
+2. Task 7.2 — Dynamic Table Sorting
+3. Task 7.3 — User Search Input Form
 
-## TASK 6.2
-VS Code Shortcuts and PEP8 Automation
+Note: the supplied PDF labels the second and third headings as “Task 8.2” and “Task 8.3” even though they appear under LAB SHEET 07. This submission keeps the Lab Sheet 07 sequence as requested and places them as Task 7.2 and Task 7.3.
 
-## TASK 6.3
-Automated Deployment Check Script
-
-Each task has its own folder and README so the submission is clearly separated by task.
+Each task has its own folder with the relevant Django code and README.
