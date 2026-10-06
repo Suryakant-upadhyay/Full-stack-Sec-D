@@ -1,11 +1,14 @@
-# LAB SHEET 07 — Task-wise Django Submission
+# LAB SHEET 08 — Task-wise Django Submission
 
-## Tasks from the supplied lab sheet
+## Tasks
 
-1. Task 7.1 — Fallback Condition Logic
-2. Task 7.2 — Dynamic Table Sorting
-3. Task 7.3 — User Search Input Form
+### Task 8.1 — Dynamic Active Navigation Highlight
+Master `base.html` with active navigation based on `active_page`.
 
-Note: the supplied PDF labels the second and third headings as “Task 8.2” and “Task 8.3” even though they appear under LAB SHEET 07. This submission keeps the Lab Sheet 07 sequence as requested and places them as Task 7.2 and Task 7.3.
+### Task 8.2 — Persistent User Message Feedback
+Django messages displayed through the shared base template.
 
-Each task has its own folder with the relevant Django code and README.
+### Task 8.3 — Professional Contact Us Form
+POST form with CSRF protection, validation, server logging and success feedback.
+
+Each task is separated into its own folder for clear submission.

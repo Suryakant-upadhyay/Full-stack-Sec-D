@@ -1,6 +1,6 @@
 from django.urls import path
-from students import views
+from django.http import HttpResponse
 
 urlpatterns = [
-    path("", views.index, name="students-index"),
+    path("", lambda request: HttpResponse("Lab Sheet 08")),
 ]
