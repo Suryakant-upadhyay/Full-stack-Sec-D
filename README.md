@@ -1,101 +1,45 @@
-# vary
+# Obsidian Maison
 
-[![NPM Version][npm-image]][npm-url]
-[![NPM Downloads][downloads-image]][downloads-url]
-[![Node.js Version][node-version-image]][node-version-url]
-[![Build Status][travis-image]][travis-url]
-[![Test Coverage][coveralls-image]][coveralls-url]
+Black and gold shopping cart. Practical B2 (Shopping Cart with Discount) wrapped in a full-stack app.
 
-Manipulate the HTTP Vary header
+- `client/src/Cart.jsx` is the graded component (default export, `products` prop, exact `data-testid` values).
+- `client/src/cartRules.js` holds every rule the sheet leaves open (discount threshold, rate, what "-" does at quantity 1).
+- `server/` is an Express API: `GET /api/products`, `POST /api/orders` (prices and discount are recomputed on the server), `GET /api/orders/:id`.
 
-## Installation
+## Run
 
-This is a [Node.js](https://nodejs.org/en/) module available through the
-[npm registry](https://www.npmjs.com/). Installation is done using the
-[`npm install` command](https://docs.npmjs.com/getting-started/installing-npm-packages-locally): 
+Needs Node 20.19+ or 22.12+.
 
-```sh
-$ npm install vary
+```bash
+npm install
+npm --prefix server install
+npm --prefix client install
+npm run dev
 ```
 
-## API
+Open http://localhost:5173
 
-<!-- eslint-disable no-unused-vars -->
+## Test
 
-```js
-var vary = require('vary')
+```bash
+npm test
 ```
 
-### vary(res, field)
+## Production-style run
 
-Adds the given header `field` to the `Vary` response header of `res`.
-This can be a string of a single field, a string of a valid `Vary`
-header, or an array of multiple fields.
-
-This will append the header if not already listed, otherwise leaves
-it listed in the current location.
-
-<!-- eslint-disable no-undef -->
-
-```js
-// Append "Origin" to the Vary header of the response
-vary(res, 'Origin')
+```bash
+npm run build
+npm start
 ```
 
-### vary.append(header, field)
+Open http://localhost:4000 (Express serves the built site and the API together).
 
-Adds the given header `field` to the `Vary` response header string `header`.
-This can be a string of a single field, a string of a valid `Vary` header,
-or an array of multiple fields.
+## Optional: real video
 
-This will append the header if not already listed, otherwise leaves
-it listed in the current location. The new header string is returned.
+Put a short clip at `client/public/hero.mp4` and the opening scene plays it scrubbed by scrolling
+(scroll down = forward, scroll up = rewind). If the file is missing, nothing changes.
+For smooth scrubbing, export with a keyframe on every frame or two, for example:
 
-<!-- eslint-disable no-undef -->
-
-```js
-// Get header string appending "Origin" to "Accept, User-Agent"
-vary.append('Accept, User-Agent', 'Origin')
+```bash
+ffmpeg -i input.mp4 -an -vf scale=1920:-2 -g 2 -crf 24 client/public/hero.mp4
 ```
-
-## Examples
-
-### Updating the Vary header when content is based on it
-
-```js
-var http = require('http')
-var vary = require('vary')
-
-http.createServer(function onRequest (req, res) {
-  // about to user-agent sniff
-  vary(res, 'User-Agent')
-
-  var ua = req.headers['user-agent'] || ''
-  var isMobile = /mobi|android|touch|mini/i.test(ua)
-
-  // serve site, depending on isMobile
-  res.setHeader('Content-Type', 'text/html')
-  res.end('You are (probably) ' + (isMobile ? '' : 'not ') + 'a mobile user')
-})
-```
-
-## Testing
-
-```sh
-$ npm test
-```
-
-## License
-
-[MIT](LICENSE)
-
-[npm-image]: https://img.shields.io/npm/v/vary.svg
-[npm-url]: https://npmjs.org/package/vary
-[node-version-image]: https://img.shields.io/node/v/vary.svg
-[node-version-url]: https://nodejs.org/en/download
-[travis-image]: https://img.shields.io/travis/jshttp/vary/master.svg
-[travis-url]: https://travis-ci.org/jshttp/vary
-[coveralls-image]: https://img.shields.io/coveralls/jshttp/vary/master.svg
-[coveralls-url]: https://coveralls.io/r/jshttp/vary
-[downloads-image]: https://img.shields.io/npm/dm/vary.svg
-[downloads-url]: https://npmjs.org/package/vary
